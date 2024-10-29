@@ -1,0 +1,18 @@
+# dotfiles
+.*
+!.gitignore
+.DS_Store
+
+# Object files
+*.o
+
+# Compiled binary files
+*.out
+*.exe
+
+# IDE specific files
+.vscode/
+.idea/
+*.swp
+*.swo
+*.user

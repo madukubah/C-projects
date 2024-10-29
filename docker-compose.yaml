@@ -1,0 +1,17 @@
+version: '3'
+services:
+  madserver:
+    build:  
+      context: .
+      dockerfile: Dockerfile
+    container_name: MADSERVER
+
+    volumes:
+      - ./app/:/etc/app
+
+    ports:
+      - "666:80"
+    
+    command: ["sh"]
+    stdin_open: true
+    tty: true
