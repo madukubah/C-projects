@@ -1,3 +1,5 @@
+## request example
+```
 GET / HTTP/1.1
 Host: localhost:666
 Connection: keep-alive
@@ -14,3 +16,14 @@ Sec-Fetch-Dest: document
 Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: en-US,en;q=0.9,id;q=0.8
 Cookie: visitor_uuid=250c8be3314d4182bb188c40ca088245; frontend_lang=en_US; tz=Asia/Makassar; checkface1=false; checkface2=false; checkface3=false; doubleco=false; stop1=true; fileToken=dummy-because-api-expects-one; session_id=3db2bd37a71ab780750d129a41d86b28c67f327f
+```
+## gcc command
+```
+gcc -o ./build/httpd httpd.c
+```
+
+## run
+```
+cd ./build
+./httpd <PORT_NO>
+```

@@ -1,17 +1,15 @@
 version: '3'
 services:
-  madserver:
+  c_prj:
     build:  
       context: .
       dockerfile: Dockerfile
-    container_name: MADSERVER
-
+    platform: linux/amd64
+    container_name: C_PROJECT
     volumes:
       - ./app/:/etc/app
-
     ports:
       - "666:80"
-    
     command: ["sh"]
     stdin_open: true
     tty: true

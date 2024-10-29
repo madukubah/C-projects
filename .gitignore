@@ -16,3 +16,7 @@
 *.swp
 *.swo
 *.user
+
+# Build directories
+# simple-webserver build
+*/*/*/build/ 

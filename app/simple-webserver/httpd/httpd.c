@@ -12,6 +12,8 @@
 
 #define LISTEN_ADDR "0.0.0.0"
 
+#define LOCATION "/etc/app/simple-webserver/httpd"
+
 /* structures */
 
 struct sHttpRequest {
@@ -166,7 +168,7 @@ int sendfile(int c, char *path){
     printf("path %s\n", path);
 
     char base_path[100];
-    strcpy(base_path, ".");
+    strcpy(base_path, LOCATION);
     strcat(base_path, path);
     if(access(base_path, F_OK) != 0){
         http_headers(c, 404);
