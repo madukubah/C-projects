@@ -1,3 +1,10 @@
+## simple webserver
+this project mimicking apache webserver at the minimum viable product (MVP)
+## TODO
+- enable server to run file (.html, .php file) (ex: php file.php)
+- create .conf files for create server instance
+- 
+
 ## request example
 ```
 GET / HTTP/1.1
@@ -19,11 +26,15 @@ Cookie: visitor_uuid=250c8be3314d4182bb188c40ca088245; frontend_lang=en_US; tz=A
 ```
 ## gcc command
 ```
-gcc -o ./build/httpd httpd.c
+gcc -o ./build/main src/main.c
 ```
 
 ## run
 ```
 cd ./build
 ./httpd <PORT_NO>
+```
+
+```
+gcc -o ./build/main src/main.c src/server.c src/server h src/config.h src/config.c
 ```

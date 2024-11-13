@@ -8,6 +8,7 @@ services:
     container_name: C_PROJECT
     volumes:
       - ./app/:/etc/app
+      - ./app/simple-webserver/public/:/var/www/html/public
     ports:
       - "666:80"
     command: ["sh"]

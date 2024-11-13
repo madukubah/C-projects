@@ -9,6 +9,10 @@ RUN apk add man-pages
 
 RUN apk add busybox-extras
 
-WORKDIR /etc/app
+RUN mkdir -p /var/www/html/public
 
+# RUN cd /var/www/html/public
+# RUN echo "<p>hello world</p>" > /var/www/html/public/index.html
+
+WORKDIR /etc/app
 CMD ["sh"]
