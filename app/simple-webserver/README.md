@@ -1,9 +1,14 @@
 ## simple webserver
 this project mimicking apache webserver at the minimum viable product (MVP)
 ## TODO
-- enable server to run file (.html, .php file) (ex: php file.php)
-- create .conf files for create server instance
-- 
+### main
+- develop CGI (Common Gateway Interface) to run dynamic file such as .php, .js
+- optimize parsing: develop DFA so it can parsing entire raw-request
+### request_hanlder
+- add more extention for images and other file ext
+- develop regex or string internings
+### routing
+- add security/middleware for accescing porbidden path
 
 ## request example
 ```
@@ -24,17 +29,10 @@ Accept-Encoding: gzip, deflate, br, zstd
 Accept-Language: en-US,en;q=0.9,id;q=0.8
 Cookie: visitor_uuid=250c8be3314d4182bb188c40ca088245; frontend_lang=en_US; tz=Asia/Makassar; checkface1=false; checkface2=false; checkface3=false; doubleco=false; stop1=true; fileToken=dummy-because-api-expects-one; session_id=3db2bd37a71ab780750d129a41d86b28c67f327f
 ```
-## gcc command
-```
-gcc -o ./build/main src/main.c
-```
 
 ## run
 ```
-cd ./build
-./httpd <PORT_NO>
-```
-
-```
-gcc -o ./build/main src/main.c src/server.c src/server h src/config.h src/config.c
+sh build.sh
+cd build/
+./simple_httpd
 ```
