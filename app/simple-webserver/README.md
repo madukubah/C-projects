@@ -8,7 +8,7 @@ this project mimicking apache webserver at the minimum viable product (MVP)
 - add more extention for images and other file ext
 - develop regex or string internings
 ### routing
-- add security/middleware for accescing porbidden path
+- add security/middleware for accescing forbidden path
 
 ## request example
 ```
