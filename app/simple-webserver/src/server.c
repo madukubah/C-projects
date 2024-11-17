@@ -9,11 +9,11 @@
 #include "config.h"
 #include "request_handler.h"
 #include "response.h"
+#include "./utils/memory.h"
 
 Server server;
 
 static char *readFile(char *configPath){
-
     FILE *file = fopen(configPath, "rb");
     if(file == NULL){
         fprintf(stderr, "Error: fopen %s\n.", configPath);
@@ -23,11 +23,7 @@ static char *readFile(char *configPath){
     int fileSize = ftell(file);
     rewind(file);
 
-    char *buff = (char *)malloc(fileSize + 1);
-    if(buff == NULL){
-        fprintf(stderr, "Error: malloc.");
-        exit(74);
-    }
+    char *buff = ALLOCATE(char, fileSize + 1);
     int readBytes = fread(buff, sizeof(char), fileSize, file);
     if(readBytes != fileSize){
         fprintf(stderr, "Read file incomplete.");
@@ -57,30 +53,38 @@ static int acceptConnection(){
 
 static void serve(int c){
     char *buff = clientRead(c);
-    if(buff == NULL) return;
+    if(buff == NULL){
+        close(c);
+        return;
+    };
 
     HttpRequest *httpRequest = parseHttp(buff);
     if(httpRequest == NULL){
         fprintf(stderr, "Failed to parse request.\n");
-        free(buff);
+        FREE(char, buff);
+        close(c);
         return;
     }
-    printf("method: %s\turl: %s\tversion: : %s\n", httpRequest->method, httpRequest->url, httpRequest->httpVersion);
+    printf("method: %s\turl: %s\tversion: %s\tpath: %s\n", httpRequest->method, httpRequest->url, httpRequest->httpVersion, httpRequest->path);
 
     int perm = checkPermission(httpRequest);
     if(perm){
         HttpResponse *response = generateResponse(httpRequest);
+        if(response != NULL){
+            sendhttpHeader(c, response->statusCode, response->type);
+            sendContent(c, response->content, response->contentLength);
+            FREE(char, response->content);
+            FREE(HttpResponse, response);
+        }
+    }else{
+        // TODO: return 403 or 404
+        sendhttpHeader(c, 404, TXT_PLAIN);
+        sendContent(c, "Not Found.", strlen("Not Found."));
     }
-    
 
-    // if(content == NULL){
-    //     sendResponse(404, content);
-    // }
-
-    // sendResponse(200, content);
-    free(httpRequest->path);
-    free(httpRequest);
-    free(buff);
+    FREE(char, httpRequest->path);
+    FREE(HttpRequest, httpRequest);
+    FREE(char, buff);
     close(c);
 }
 
@@ -93,7 +97,7 @@ int initServer(char *configPath){
 
     char *buff = readFile(configPath);
     int res = parseConfig(buff);
-    free(buff);
+    FREE(char, buff);
 
     if(res == 0){
         return 0;

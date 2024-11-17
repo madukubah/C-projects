@@ -8,7 +8,7 @@ CC="gcc"                     # Compiler
 CFLAGS="-Wall -Wextra -g"    # Compilation flags
 
 # List of source files (space-separated instead of array)
-SRC_FILES="main.c server.c config.c request_handler.c response.c utils/scanner.c"
+SRC_FILES="main.c server.c config.c request_handler.c response.c utils/scanner.c utils/memory.c"
 
 # Clean up old object files and executable
 echo "Cleaning up old build files..."

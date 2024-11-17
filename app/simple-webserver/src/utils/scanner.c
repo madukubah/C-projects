@@ -27,6 +27,11 @@ char peek(Scanner *scanner){
     return *scanner->current;
 }
 
+char peekNext(Scanner *scanner){
+    if(isAtEnd(scanner)) return '\0';
+    return scanner->current[1];
+}
+
 bool isAtEnd(Scanner *scanner){
     return *scanner->current == '\0';
 }
@@ -50,7 +55,7 @@ char *readLine(Scanner *scanner){
     int n = 0;
     char *p = scanner->start;
     scanner->start = scanner->current;
-    while(peek(scanner) != '\n' && !isAtEnd(scanner)){
+    while((peek(scanner) != '\r' && peekNext(scanner) != '\n') && !isAtEnd(scanner)){
         n++;
         advance(scanner);
     }

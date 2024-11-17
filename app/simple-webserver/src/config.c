@@ -7,6 +7,7 @@
 #include "config.h"
 #include "server.h"
 #include "./utils/scanner.h"
+#include "./utils/memory.h"
 
 int parseConfig(char *str){
     Scanner scanner;
@@ -32,7 +33,7 @@ int parseConfig(char *str){
                             while(((isAphaNumeric(peek(&scanner)) || peek(&scanner) == '.') && !isAtEnd(&scanner))) advance(&scanner);
                             size_t len = (int)(scanner.current - scanner.start);
                             if(len > 0){
-                                server.listen = (char *)malloc(len + 1);
+                                server.listen = ALLOCATE(char, len + 1);
                                 memcpy(server.listen, scanner.start, len);
                                 server.listen[len + 1] = '\0';
                             }else{
@@ -71,7 +72,7 @@ int parseConfig(char *str){
                             while(((isAphaNumeric(peek(&scanner)) || (peek(&scanner) == '/')) && !isAtEnd(&scanner))) advance(&scanner);
                             size_t len = (int)(scanner.current - scanner.start);
                             if(len > 0){
-                                server.rootDocument = (char *)malloc(len + 1);
+                                server.rootDocument = ALLOCATE(char, len + 1);
                                 memcpy(server.rootDocument, scanner.start, len);
                                 server.rootDocument[len + 1] = '\0';
                             }else{
@@ -93,7 +94,7 @@ int parseConfig(char *str){
                             while(((isAphaNumeric(peek(&scanner)) || peek(&scanner) == '.') && !isAtEnd(&scanner))) advance(&scanner);
                             size_t len = (int)(scanner.current - scanner.start);
                             if(len > 0){
-                                server.index = (char *)malloc(len + 1);
+                                server.index = ALLOCATE(char, len + 1);
                                 memcpy(server.index, scanner.start, len);
                                 server.index[len + 1] = '\0';
                             }else{
