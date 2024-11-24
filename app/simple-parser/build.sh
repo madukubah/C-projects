@@ -6,7 +6,7 @@ OUTPUT="simplex"
 CC="gcc"
 CFLAGS="-Wall -Wextra -g"
 
-SRC_FILES="main.c"
+SRC_FILES="main.c nfa.c utils/scanner.c"
 
 echo "Celaning up old build files..."
 rm -rf  $SRC_FILES/*.o $OUT_DIR
@@ -25,7 +25,7 @@ for SRC_FILE in $SRC_FILES; do
 
     $CC $CFLAGS -c "$SRC_DIR/$SRC_FILE" -o "$OUT_DIR/$OBJ_FILE"
 
-    if [ $? -ne 0]; then
+    if [ $? -ne 0 ]; then
         echo "Error compiling $SRC_FILE"
         exit 1
     fi
@@ -35,9 +35,9 @@ done
 
 $CC $OBJ_FILES -o "$OUT_DIR/$OUTPUT"
 
-if [ $? -ne 0]; then
+if [ $? -ne 0 ]; then
     echo "Linking failed."
     exit 1
+else
+    echo "Compilation successful. executable created: $OUT_DIR/$OUTPUT"
 fi
-
-echo "Compilation successful. executable created: $OUT_DIR/$OUTPUT"
