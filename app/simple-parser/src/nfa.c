@@ -4,117 +4,172 @@
 
 #include "nfa.h"
 #include "utils/scanner.h"
+#include "utils/parser.h"
 
-static void concat(Nfa *nfa, int c){
-    printf("concat \n");
-    if(nfa->stateCount + 1 > MAX_STATES){
-        fprintf(stderr, "reach max states limit: %d", MAX_STATES);
-        exit(1);
-    }
-    nfa->nfa[nfa->stateCount][(int)c][nfa->stateCount + 1] = 1;
-    printf("state %d -> %d\n", nfa->stateCount, nfa->stateCount + 1);
+typedef struct {
+    NfaItem items[1024];
+    int top;
+} Stack;
 
-    nfa->stateCount += 1;
-    nfa->accState[nfa->accStateCount++] = nfa->stateCount;
+Stack stack;
+
+static void initStack(){
+    stack.top = 0;
 }
-static void kleen(Nfa *nfa, int c){
-    printf("kleen \n");
 
-    if(nfa->stateCount + 1 > MAX_STATES){
-        fprintf(stderr, "reach max states limit: %d", MAX_STATES);
-        exit(1);
+static void push(NfaItem item){
+    stack.items[stack.top++] = item;
+}
+
+static NfaItem pop(){
+    return stack.items[--stack.top];
+}
+
+static bool isAlphaNumeric(char c){
+    return ('a' <= c && c <= 'z') ||
+            ('A' <= c && c <= 'Z') ||
+            ('0' <= c && c <= '9');
+}
+
+static void addConcat(char *dst, const char *regex){
+    int i, j = 0;
+    char prev = '\0';
+    for(i = 0;  regex[i] != '\0'; i++){
+        char curr = regex[i];
+        if(j >= 1){
+            if(
+                (isAlphaNumeric(prev) || prev == ')' || prev == '*' )
+                &&
+                (isAlphaNumeric(curr) || curr == '(')
+            ){
+                dst[j++] = '.';
+            }
+
+        }
+        dst[j++] = curr;
+        prev = curr;
     }
-    int s0 = nfa->stateCount;
+    dst[j] = '\0';
+}
 
-    nfa->nfa[nfa->stateCount][0][nfa->stateCount + 1] = 1;
-    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, nfa->stateCount + 1);
-    nfa->stateCount++;
-
-    int s1 = nfa->stateCount;
+static void literal(NfaItem *item, Nfa *nfa, int c){
+    printf("literal:\n");
+    int start = nfa->stateCount;
     nfa->nfa[nfa->stateCount][c][nfa->stateCount + 1] = 1;
-    printf("state %d ->%c-> %d\n", nfa->stateCount, c, nfa->stateCount + 1);
+    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)c, nfa->stateCount + 1);
+    nfa->stateCount++;
+    int finish = nfa->stateCount;
+
+    item->start = start;
+    item->finish = finish;
+
+    nfa->stateCount++;
+}
+
+static void concat(NfaItem *result, NfaItem *item1, NfaItem *item2, Nfa *nfa){
+    printf("concat:\n");
+    nfa->nfa[item1->finish][0][item2->start] = 1;
+    result->start = item1->start;
+    result->finish = item2->finish;
+
+    printf("start: %d\n", result->start);
+    printf("concat %d -> %d\n", item1->finish, item2->start);
+    printf("finish: %d\n", result->finish);
+
+    nfa->stateCount++;
+}
+
+static void alt(NfaItem *result, NfaItem *item1, NfaItem *item2, Nfa *nfa){
+    printf("alt:\n");
+    int start = nfa->stateCount;
+
+    nfa->nfa[nfa->stateCount][0][item1->start] = 1;
+    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, item1->start);
+
+    nfa->nfa[nfa->stateCount][0][item2->start] = 1;
+    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, item2->start);
+
+    nfa->nfa[item1->finish][0][nfa->stateCount + 1] = 1;
+    printf("state %d ->%c-> %d\n", item1->finish, (char)0, nfa->stateCount + 1);
+    nfa->nfa[item2->finish][0][nfa->stateCount + 1] = 1;
+    printf("state %d ->%c-> %d\n", item2->finish, (char)0, nfa->stateCount + 1);
+
     nfa->stateCount++;
 
-    nfa->nfa[nfa->stateCount][0][s1] = 1;
-    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, s1);
+    int finish = nfa->stateCount;
+    result->start = start;
+    result->finish = finish;
 
+    nfa->stateCount++;
+}
+
+static void star(NfaItem *result, NfaItem *item, Nfa *nfa){
+    printf("star:\n");
+    int start = nfa->stateCount;
+
+    nfa->nfa[nfa->stateCount][0][item->start] = 1;
+    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, item->start);
+    nfa->nfa[item->finish][0][item->start] = 1;
+    printf("state %d ->%c-> %d\n", item->finish, (char)0, item->start);
+    nfa->nfa[item->finish][0][nfa->stateCount + 1] = 1;
+    printf("state %d ->%c-> %d\n", item->finish, (char)0, nfa->stateCount + 1);
     nfa->nfa[nfa->stateCount][0][nfa->stateCount + 1] = 1;
     printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, nfa->stateCount + 1);
+
     nfa->stateCount++;
 
-    nfa->nfa[s0][0][nfa->stateCount] = 1;
-    printf("state %d ->%c-> %d\n", s0, (char)0, nfa->stateCount);
+    int finish = nfa->stateCount;
+    result->start = start;
+    result->finish = finish;
 
-    nfa->accState[nfa->accStateCount++] = nfa->stateCount;
+    nfa->stateCount++;
 }
 
-static void _union(Nfa *nfa, int c1, int c2){
-    printf("union \n");
+static void buildNfa(Nfa *nfa, OperationList opList){
+    initStack();
 
-    if(nfa->stateCount + 1 > MAX_STATES){
-        fprintf(stderr, "reach max states limit: %d", MAX_STATES);
-        exit(1);
+    for(int i = 0; i < opList.count; i++){
+        Operation op = opList.operations[i];
+        switch(op.opcode){
+            case OP_LITERAL: {
+                NfaItem item;
+                literal(&item, nfa, (int)op.value);
+                push(item);
+                break;
+            }
+            case OP_CONCAT: {
+                NfaItem item2 = pop();
+                NfaItem item1 = pop();
+                NfaItem result;
+                concat(&result, &item1, &item2, nfa);
+                push(result);
+                break;
+            }
+            case OP_KLEEN:{
+                NfaItem item = pop();
+                NfaItem result;
+                star(&result, &item, nfa);
+                push(result);
+                break;
+            }
+            case OP_PIPE:{
+                NfaItem item2 = pop();
+                NfaItem item1 = pop();
+                NfaItem result;
+                alt(&result, &item1, &item2, nfa);
+                push(result);
+                break;
+            }
+        }
     }
-    int tmp1, tmp2;
-    nfa->nfa[nfa->stateCount][0][nfa->stateCount + 1] = 1;
-    tmp1 = nfa->stateCount + 1;
-    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, nfa->stateCount + 1);
-    
-    nfa->nfa[nfa->stateCount][0][nfa->stateCount + 2] = 1;
-    printf("state %d ->%c-> %d\n", nfa->stateCount, (char)0, nfa->stateCount + 2);
-    tmp2 = nfa->stateCount + 2;
-
-    nfa->stateCount += 2;
-    
-    nfa->nfa[tmp1][(int)c1][nfa->stateCount + 1] = 1;
-    printf("state %d ->%c-> %d\n", tmp1, c1, nfa->stateCount + 1);
-    tmp1 = nfa->stateCount + 1;
-
-    nfa->nfa[tmp2][(int)c2][nfa->stateCount + 2] = 1;
-    printf("state %d ->%c-> %d\n", tmp2, c2, nfa->stateCount + 2);
-    tmp2 = nfa->stateCount + 2;
-
-    nfa->stateCount += 2;
-
-    nfa->nfa[tmp1][0][nfa->stateCount + 1] = 1;
-    printf("state %d ->%c-> %d\n", tmp1, (char)0, nfa->stateCount + 1);
-    nfa->nfa[tmp2][0][nfa->stateCount + 1] = 1;
-    printf("state %d ->%c-> %d\n", tmp2, (char)0, nfa->stateCount + 1);
-
-    nfa->stateCount += 1;
-    nfa->accState[nfa->accStateCount++] = nfa->stateCount;
+    NfaItem result = pop();
+    nfa->startState = result.start;
+    nfa->accState[nfa->accStateCount++] = result.finish;
+    printf("accState: %d\n", nfa->accState[nfa->accStateCount - 1]);
 
 }
 
-static void buildNfa(Nfa *nfa, const char *regex){
-    Scanner scanner;
-    initScanner(&scanner, regex);
 
-    while(1){
-        if(isAtEnd(&scanner)) break;
-        char c = advance(&scanner);
-        printf("c: %c\n", c);
-
-        if(isAphaNumeric(c) && peek(&scanner) == '*'){
-            advance(&scanner);
-            kleen(nfa, c);
-        }
-        else if(isAphaNumeric(c) && peek(&scanner) == '|' && isAphaNumeric(peekNext(&scanner))){
-            advance(&scanner);
-            char c2 = advance(&scanner);
-            _union(nfa, c, c2);
-        }
-        else if(isAphaNumeric(c)){
-            concat(nfa, c);
-        }
-        
-    }
-    printf("accState State: \n");
-    for(int i = 0; i < nfa->accStateCount; i++){
-        printf("%d, ", nfa->accState[i]);
-    }
-    printf("\n");
-}
 
 static int move(int states[MAX_STATES], int stateCount, int c, Nfa *nfa){
     printf("move({");
@@ -187,37 +242,42 @@ static int eClosure(int states[MAX_STATES], int stateCount, Nfa *nfa){
     return closureCount;
 }
 
-static int _match(const char *str, Nfa *nfa){
-    printf("\nmatch\n");
-    Scanner scanner;
-    initScanner(&scanner, str);
+static int match(const char *str, Nfa *nfa){
+    const char *p = str;
+
     int stateCount = 0;
     int nextStates[MAX_STATES];
-    
-    nextStates[0] = 0;
+    nextStates[0] = nfa->startState;
+
     stateCount = eClosure(nextStates, 1, nfa);
     if(stateCount == 0){
-        nextStates[0] = 0;
+        nextStates[0] = nfa->startState;
         stateCount = 1;
     }
 
-    while(!isAtEnd(&scanner)){
-        char c = advance(&scanner);
+    while(*p != '\0'){
+        char c = *p;
         printf("c: %c\n", c);
-
         stateCount = move(nextStates, stateCount, (int)c, nfa);
         stateCount = eClosure(nextStates, stateCount, nfa);
         if(stateCount == 0){
-            stateCount = 1;
+           stateCount = 1; 
         }
+        p++;
     }
+
+
+    printf("end states: ");
     for(int i = 0; i < stateCount; i++){
-        printf("end states: %d\n", nextStates[i]);
+        printf("%d, ", nextStates[i]);
         if(nextStates[i] == nfa->accState[nfa->accStateCount - 1]){
             return 1;
         }
     }
+    printf("\n");
+
     return 0;
+
 }
 
 void InitNfa(Nfa *nfa){
@@ -234,10 +294,41 @@ void nfa(const char *str, const char *regex){
 
     Nfa nfa;
     InitNfa(&nfa);
-    buildNfa(&nfa, regex);
-    if(_match(str, &nfa)){
-        printf("Match!\n");
+
+    char augmentedRegex[512];
+    addConcat(augmentedRegex, regex);
+    printf("augmentedRegex: %s\n", augmentedRegex);
+
+    OperationList operationList = parse(augmentedRegex);
+    printf("\n\n");
+
+    for(int i = 0; i < operationList.count; i++){
+        Operation op = operationList.operations[i];
+        switch(op.opcode){
+            case OP_LITERAL:
+                printf("Literal: %c\n", op.value);
+                break;
+            case OP_CONCAT:
+                printf("CONCAT\n");
+                break;
+            case OP_KLEEN:
+                printf("KLEEN\n");
+                break;
+            case OP_PIPE:
+                printf("PIPE\n");
+                break;
+        }
+    }
+
+    printf("\n\n");
+
+    buildNfa(&nfa, operationList);
+
+    printf("\n\n");
+
+    if(match(str, &nfa)){
+        printf("\nMATCH!\n");
     }else{
-        printf("Not Match!\n");
+        printf("\nNOT MATCH!\n");
     }
 }

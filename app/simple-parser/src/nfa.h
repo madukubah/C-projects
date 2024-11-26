@@ -13,6 +13,11 @@ typedef struct Nfa
     int accStateCount;
 } Nfa;
 
+typedef struct {
+    int start;
+    int finish;
+} NfaItem;
+
 
 void nfa(const char *str, const char *regex);
 void InitNfa(Nfa *nfa);

@@ -6,52 +6,65 @@
 
 #include "scanner.h"
 
-bool isAlpha(const char c){
+Scanner scanner;
+
+static bool isAlpha(const char c){
     return (c >= 'a' && c <= 'z' ) || (c >= 'A' && c <= 'Z' ) || c == '_';
 }
 
-bool isDigit(const char c){
+static bool isDigit(const char c){
     return (c >= '0' && c <= '9' );
 }
 
-bool isAphaNumeric(const char c){
+static bool isAphaNumeric(const char c){
     return isAlpha(c) || isDigit(c);
 }
 
-char advance(Scanner *scanner){
-    scanner->current++;
-    return scanner->current[-1];
+static char advance(){
+    scanner.current++;
+    return scanner.current[-1];
 }
 
-char peek(Scanner *scanner){
-    return *scanner->current;
+static char peek(){
+    return *scanner.current;
 }
 
-char peekNext(Scanner *scanner){
-    if(isAtEnd(scanner)) return '\0';
-    return scanner->current[1];
+static bool isAtEnd(){
+    return *scanner.current == '\0';
 }
 
-bool isAtEnd(Scanner *scanner){
-    return *scanner->current == '\0';
-}
+static Token makeToken(TokenType type){
+    Token token;
+    token.type = type;
+    token.value = *scanner.start;
+    return token;
+}   
 
-void skipWhiteSpace(Scanner *scanner){
-    for(;;){
-        switch(peek(scanner)){
-            case ' ':
-            case '\n':
-            case '\r':
-            case '\t':
-                advance(scanner);
+Token scanToken(){
+    scanner.start = scanner.current;
+    if(isAtEnd()) return makeToken(TOKEN_EOF);
+    
+    char c = advance();
+
+    if(isAphaNumeric(c)){
+        return makeToken(TOKEN_LITERAL);
+    }else{
+        switch(c){
+            case '(': return makeToken(TOKEN_LEFT_PARENT);
+            case ')': return makeToken(TOKEN_RIGHT_PARENT);
+            case '|': return makeToken(TOKEN_PIPE);
+            case '*': return makeToken(TOKEN_STAR);
+            case '.': return makeToken(TOKEN_DOT);
+            default: 
+                fprintf(stderr, "char is not recognized.\n");
+                return makeToken(TOKEN_ERROR);
                 break;
-            default:
-                return;
         }
     }
+    return makeToken(TOKEN_ERROR);
 }
 
-void initScanner(Scanner *scanner, const char *str){
-    scanner->start = str;
-    scanner->current = str;
+void initScanner(const char *str){
+    scanner.start = str;
+    scanner.current = str;
 }
