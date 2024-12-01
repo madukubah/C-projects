@@ -52,8 +52,6 @@ static void setAccState(FiniteAuto *dfa, FiniteAuto *fa){
     }
 }
 static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
-    int marked[MAX_SYMBOLS] = {0};
-
     int stack[2014] = {-1};
     int stackTop = 0;
 
@@ -81,8 +79,6 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
     while(stackTop != 0){
         int s = stack[--stackTop];
         printf("s %d\n", s);
-
-        marked[s] = 1;
 
         for(int i = 0; i < inputCount; i++){
             stateCount = move(nextStates, stateCount, inputSymbols[i], fa);
