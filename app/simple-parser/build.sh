@@ -8,7 +8,7 @@ CFLAGS="-Wall -Wextra -g"
 
 SRC_FILES="main.c finite.c dfa.c nfa.c utils/scanner.c utils/parser.c"
 
-echo "Celaning up old build files..."
+echo "Cleaning up old build files..."
 rm -rf  $SRC_FILES/*.o $OUT_DIR
 
 if [ ! -d "$OUT_DIR" ]; then
