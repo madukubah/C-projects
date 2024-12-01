@@ -93,7 +93,6 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
     stack[stackTop++] = dfaStatesCount;
     dfaStatesCount++;
 
-    int count = 0;
     while(stackTop != 0){
         int s = stack[--stackTop];
         printf("s %d\n", s);
