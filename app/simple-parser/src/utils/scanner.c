@@ -25,10 +25,6 @@ static char advance(){
     return scanner.current[-1];
 }
 
-static char peek(){
-    return *scanner.current;
-}
-
 static bool isAtEnd(){
     return *scanner.current == '\0';
 }
