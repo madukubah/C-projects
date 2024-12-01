@@ -11,21 +11,6 @@ int dfaStatesCount = 0;
 int inputSymbols[MAX_SYMBOLS] = {0};
 int inputCount = 0;
 
-static int dTrans(int states[], int stateCount, int c, FiniteAuto *fa){
-    int dstStates[MAX_STATES];
-    int count = 0;
-
-    stateCount = move(states, stateCount, (int)c, fa);
-    stateCount = eClosure(states, stateCount, fa);
-
-
-    for(int i = 0; i < count; i++){
-        states[i] = dstStates[i];
-    }
-
-    return count;
-}
-
 static int findDfaState(int states[], int stateCount){
     printf("findDfaState \n");
     for(int i = 0; i < stateCount; i++){
