@@ -34,12 +34,12 @@ static void insertConcat(char *dst, const char *regex){
 }
 
 int move(int states[], int stateCount, int c, FiniteAuto *fa){
-    printf("move \n");
-    for(int i = 0; i < stateCount; i++){
-        printf("%d, ", states[i]);
+    // printf("move %c\n", c);
+    // for(int i = 0; i < stateCount; i++){
+    //     printf("%d, ", states[i]);
 
-    }
-    printf("\n");
+    // }
+    // printf("\n");
     int dstStates[MAX_STATES];
     int count = 0;
     for(int i = 0; i < stateCount; i++){
@@ -51,19 +51,18 @@ int move(int states[], int stateCount, int c, FiniteAuto *fa){
     }
     for(int i = 0; i < count; i++){
         states[i] = dstStates[i];
-        printf("%d, ", states[i]);
+        // printf("%d, ", states[i]);
     }
-    printf("\n");
+    // printf("\n");
 
     return count;
 }
 
 int eClosure(int states[],int stateCount, FiniteAuto *fa){
-    printf("eClosure \n");
-    for(int i = 0; i < stateCount; i++){
-        printf("%d, ", states[i]);
-
-    }
+    // printf("eClosure \n");
+    // for(int i = 0; i < stateCount; i++){
+    //     printf("%d, ", states[i]);
+    // }
 
     int closure[MAX_STATES];
     int closureCount = 0;
@@ -93,13 +92,13 @@ int eClosure(int states[],int stateCount, FiniteAuto *fa){
         }
     }
 
-    printf(" \n");
+    // printf(" \n");
     for(int i = 0; i < closureCount; i++){
         states[i] = closure[i];
-        printf("%d, ", states[i]);
+        // printf("%d, ", states[i]);
 
     }
-    printf("\n");
+    // printf("\n");
 
     return closureCount;
 }
@@ -125,9 +124,9 @@ int isMatch(const char *str, FiniteAuto *fa){
     }
 
 
-    printf("Check State \n");
+    // printf("Check State \n");
     for(int i = 0; i < stateCount; i++){
-        printf("%d, %d \n", nextStates[i], fa->accState[fa->accStateCount - 1]);
+        // printf("%d, %d \n", nextStates[i], fa->accState[fa->accStateCount - 1]);
         if(nextStates[i] == fa->accState[fa->accStateCount - 1]){
             return 1;
         }

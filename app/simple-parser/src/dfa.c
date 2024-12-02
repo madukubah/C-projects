@@ -12,22 +12,24 @@ int inputSymbols[MAX_SYMBOLS] = {0};
 int inputCount = 0;
 
 static int findDfaState(int states[], int stateCount){
-    printf("findDfaState \n");
-    for(int i = 0; i < stateCount; i++){
-        printf("%d, ", states[i]);
+    // printf("findDfaState \n");
+    // for(int i = 0; i < stateCount; i++){
+    //     printf("%d, ", states[i]);
 
-    }
-    printf("\n");
-    printf("DfaState \n");
-    for(int i = 0; i < dfaStatesCount; i++){
-        for(int j = 0; j < MAX_STATES; j++){
-            if(dfaStates[i][j] == 1){
-                printf("%d, ", j);
-            }
-        }
-        printf("\n");
-    }
-    printf("\n");
+    // }
+    // printf("\n");
+    // printf("DfaState \n");
+    // for(int i = 0; i < dfaStatesCount; i++){
+    //     printf("%d: ", i);
+    //     for(int j = 0; j < MAX_STATES; j++){
+    //         if(dfaStates[i][j] == 1){
+    //             printf("%d, ", j);
+    //         }
+    //     }
+    //     printf("\n");
+    // }
+    // printf("\n");
+
     for(int i = 0; i < dfaStatesCount; i++){
         for(int j = 0; j < stateCount; j++){
             if(dfaStates[i][states[j]] != 1){
@@ -41,16 +43,47 @@ static int findDfaState(int states[], int stateCount){
     return -1;
 }
 static void setAccState(FiniteAuto *dfa, FiniteAuto *fa){
-    printf("setAccState \n");
+    // printf("DfaState \n");
+    // for(int i = 0; i < dfaStatesCount; i++){
+    //     printf("%d: ", i);
+    //     for(int j = 0; j < MAX_STATES; j++){
+    //         if(dfaStates[i][j] == 1){
+    //             printf("%d, ", j);
+    //         }
+    //     }
+    //     printf("\n");
+    // }
+    // printf("\n");
+    // printf("setAccState \n");
     for(int i = 0; i < dfaStatesCount; i++){
         if(dfaStates[i][fa->accState[fa->accStateCount - 1]] == 1){
             dfa->accState[dfa->accStateCount++] = i;
-            printf("dfa->accState %d, ", i);
-            printf("fa->accState %d\n", fa->accState[fa->accStateCount - 1]);
+            // printf("dfa->accState %d, ", dfa->accState[dfa->accStateCount - 1]);
+            // printf("fa->accState %d\n", fa->accState[fa->accStateCount - 1]);
 
         }
     }
 }
+
+static int getDfaTStates(int states[], int s){
+    // printf("getDfaTStates %d\n", s);
+    int dstStates[MAX_STATES];
+    int count = 0;
+    for(int i = 0; i < MAX_STATES; i++){
+        if(dfaStates[s][i] == 1){
+            dstStates[count++] = i;
+        }
+    }
+
+    // printf("\n");
+    for(int i = 0; i < count; i++){
+        states[i] = dstStates[i];
+        // printf("%d, ", states[i]);
+    }
+    // printf("\n");
+    return count;
+}
+
 static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
     int stack[2014] = {-1};
     int stackTop = 0;
@@ -78,14 +111,16 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
 
     while(stackTop != 0){
         int s = stack[--stackTop];
-        printf("s %d\n", s);
+        // printf("s %d\n", s);
 
         for(int i = 0; i < inputCount; i++){
+            stateCount = getDfaTStates(nextStates, s);
+
             stateCount = move(nextStates, stateCount, inputSymbols[i], fa);
             stateCount = eClosure(nextStates, stateCount, fa);
-            if(stateCount == 0) break;
+            if(stateCount == 0) continue;
             int find = findDfaState(nextStates, stateCount);
-            printf("find %d\n", find);
+            // printf("find %d\n", find);
             if(find == -1){
                 for(int j = 0; j < stateCount; j++){
                     dfaStates[dfaStatesCount][nextStates[j]] = 1;
@@ -93,11 +128,13 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
                 stack[stackTop++] = dfaStatesCount;
                 find = dfaStatesCount;
                 dfaStatesCount++;
-                printf("find %d\n", find);
+                // printf("find %d\n", find);
             }
             dfa->map[s][inputSymbols[i]][find] = 1;
+            // printf("state: %d->%c->%d\n", s, (char)inputSymbols[i], find);
+
         }
-        printf("top %d\n", stackTop);
+        // printf("top %d\n", stackTop);
     }
     setAccState(dfa, fa);
 }
@@ -132,24 +169,18 @@ int dfaMatch(const char *str, const char *regex){
     initDfa();
     setInputSymbols(regex);
 
-    printf("setInputSymbols \n");
-    for(int i = 0; i < inputCount; i++){
-        printf("%c, ", (char)inputSymbols[i]);
-    }
-    printf("\n");
-
-
     FiniteAuto *dfa = AllocateFa();
     subsetConstruction(dfa, fa);
 
-    if(isMatch(str, fa)){
-        printf("\nMATCH!\n");
+    if(isMatch(str, dfa)){
+        // printf("MATCH!\n");
+        freeFa(fa);
+        freeFa(dfa);
         return 1;
     }else{
-        printf("\nNOT MATCH!\n");
+        // printf("NOT MATCH!\n");
+        freeFa(fa);
+        freeFa(dfa);
+        return 0;
     }
-    
-    freeFa(fa);
-    freeFa(dfa);
-    return 0;
 }

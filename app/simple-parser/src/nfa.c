@@ -120,45 +120,45 @@ void buildNfa(FiniteAuto *fa, OperationList opList){
     FiniteAutoItem result = pop();
     fa->startState = result.start;
     fa->accState[fa->accStateCount++] = result.finish;
-    printf("accState: %d\n", fa->accState[fa->accStateCount - 1]);
+    // printf("accState: %d\n", fa->accState[fa->accStateCount - 1]);
 }
 
 int nfaMatch(const char *str, const char *regex){
     FiniteAuto *fa = AllocateFa();
     OperationList operationList = getOpList(regex);
 
-    printf("\n\n");
+    // printf("\n\n");
 
-    for(int i = 0; i < operationList.count; i++){
-        Operation op = operationList.operations[i];
-        switch(op.opcode){
-            case OP_LITERAL:
-                printf("Literal: %c\n", op.value);
-                break;
-            case OP_CONCAT:
-                printf("CONCAT\n");
-                break;
-            case OP_KLEEN:
-                printf("KLEEN\n");
-                break;
-            case OP_PIPE:
-                printf("PIPE\n");
-                break;
-        }
-    }
+    // for(int i = 0; i < operationList.count; i++){
+    //     Operation op = operationList.operations[i];
+    //     switch(op.opcode){
+    //         case OP_LITERAL:
+    //             printf("Literal: %c\n", op.value);
+    //             break;
+    //         case OP_CONCAT:
+    //             printf("CONCAT\n");
+    //             break;
+    //         case OP_KLEEN:
+    //             printf("KLEEN\n");
+    //             break;
+    //         case OP_PIPE:
+    //             printf("PIPE\n");
+    //             break;
+    //     }
+    // }
 
-    printf("\n\n");
+    // printf("\n\n");
 
     buildNfa(fa, operationList);
 
     if(isMatch(str, fa)){
-        printf("\nMATCH!\n");
+        // printf("MATCH!\n");
+        freeFa(fa);
         return 1;
+    }else{
+        // printf("NOT MATCH!\n");
+        freeFa(fa);
+        return 0;
     }
-    
-    printf("\nNOT MATCH!\n");
-
-    freeFa(fa);
-    return 0;
 }
 

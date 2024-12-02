@@ -8,10 +8,18 @@ int main(int argc,const char *argv[]){
 
     if(argc == 4){
         if(strlen(argv[1]) == 3 && memcmp(argv[1], "nfa", 3) == 0){
-            nfaMatch(argv[2], argv[3]);
+            if(nfaMatch(argv[2], argv[3])){
+                printf("MATCH!\n");
+            }else{
+                printf("NOT MATCH!\n");
+            }
         }
         if(strlen(argv[1]) == 3 && memcmp(argv[1], "dfa", 3) == 0){
-            dfaMatch(argv[2], argv[3]);
+            if(dfaMatch(argv[2], argv[3])){
+                printf("MATCH!\n");
+            }else{
+                printf("NOT MATCH!\n");
+            }
         }
     }else{
         fprintf(stderr, "Usage: \nsimplex nfa [string] [regex]\nsimplex dfa [string] [regex]\n");
