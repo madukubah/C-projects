@@ -3,6 +3,11 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "common.h"
+#ifdef DEBUG_MODE
+#include "./utils/debug.h"
+#endif
+
 #include "finite.h"
 #include "utils/parser.h"
 
@@ -31,15 +36,21 @@ static void insertConcat(char *dst, const char *regex){
         prev = curr;
     }
     dst[j] = '\0';
+#ifdef DEBUG_MODE
+    printf("Augmented regex: %s\n", dst);
+#endif
 }
 
 int move(int states[], int stateCount, int c, FiniteAuto *fa){
-    // printf("move %c\n", c);
-    // for(int i = 0; i < stateCount; i++){
-    //     printf("%d, ", states[i]);
+#ifdef DEBUG_MODE
+    printf("move %c\n", c);
+    for(int i = 0; i < stateCount; i++){
+        printf("%d, ", states[i]);
 
-    // }
-    // printf("\n");
+    }
+    printf("\n");
+#endif
+    
     int dstStates[MAX_STATES];
     int count = 0;
     for(int i = 0; i < stateCount; i++){
@@ -51,18 +62,26 @@ int move(int states[], int stateCount, int c, FiniteAuto *fa){
     }
     for(int i = 0; i < count; i++){
         states[i] = dstStates[i];
-        // printf("%d, ", states[i]);
     }
-    // printf("\n");
 
+#ifdef DEBUG_MODE
+    for(int i = 0; i < count; i++){
+        printf("%d, ", states[i]);
+
+    }
+    printf("\n");
+#endif
     return count;
 }
 
 int eClosure(int states[],int stateCount, FiniteAuto *fa){
-    // printf("eClosure \n");
-    // for(int i = 0; i < stateCount; i++){
-    //     printf("%d, ", states[i]);
-    // }
+#ifdef DEBUG_MODE
+    printf("eClosure \n");
+    for(int i = 0; i < stateCount; i++){
+        printf("%d, ", states[i]);
+    }
+#endif
+    
 
     int closure[MAX_STATES];
     int closureCount = 0;
@@ -92,18 +111,26 @@ int eClosure(int states[],int stateCount, FiniteAuto *fa){
         }
     }
 
-    // printf(" \n");
     for(int i = 0; i < closureCount; i++){
         states[i] = closure[i];
-        // printf("%d, ", states[i]);
 
     }
-    // printf("\n");
+
+#ifdef DEBUG_MODE
+    printf("\n");
+    for(int i = 0; i < closureCount; i++){
+        printf("%d, ", states[i]);
+    }
+    printf("\n");
+#endif
 
     return closureCount;
 }
 
 int isMatch(const char *str, FiniteAuto *fa){
+#ifdef DEBUG_MODE
+    printf("isMatch: %s\n", str);
+#endif
     const char *p = str;
 
     int nextStates[MAX_STATES];
@@ -149,6 +176,11 @@ OperationList getOpList(const char *regex){
     char augmentedRegex[512];
     insertConcat(augmentedRegex, regex);
     OperationList operationList = parse(augmentedRegex);
+
+    #ifdef DEBUG_MODE
+        printOpList(operationList);
+    #endif
+
     return operationList;
 }
 

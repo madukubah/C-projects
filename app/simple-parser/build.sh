@@ -6,7 +6,7 @@ OUTPUT="simplex"
 CC="gcc"
 CFLAGS="-Wall -Wextra -g"
 
-SRC_FILES="main.c finite.c dfa.c nfa.c utils/scanner.c utils/parser.c"
+SRC_FILES="main.c finite.c dfa.c nfa.c utils/scanner.c utils/parser.c utils/debug.c"
 
 echo "Cleaning up old build files..."
 rm -rf  $SRC_FILES/*.o $OUT_DIR
@@ -20,6 +20,7 @@ if [ ! -d "$OUT_DIR/utils" ]; then
 fi
 
 OBJ_FILES=""
+
 for SRC_FILE in $SRC_FILES; do
     OBJ_FILE="${SRC_FILE%.c}.o"
 

@@ -80,7 +80,7 @@ static void appendOperation(Opcode code, char value){
 
 static void _grouping(){
     expression();
-    consume(TOKEN_RIGHT_PARENT, "Expect ']' token.");
+    consume(TOKEN_RIGHT_PARENT, "Expect ')' token.");
 }
 
 static void _literal(){

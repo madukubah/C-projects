@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "common.h"
 #include "dfa.h"
 #include "nfa.h"
 #include "finite.h"
@@ -12,23 +13,26 @@ int inputSymbols[MAX_SYMBOLS] = {0};
 int inputCount = 0;
 
 static int findDfaState(int states[], int stateCount){
-    // printf("findDfaState \n");
-    // for(int i = 0; i < stateCount; i++){
-    //     printf("%d, ", states[i]);
+#ifdef DEBUG_MODE
+    printf("findDfaState \n");
+    for(int i = 0; i < stateCount; i++){
+        printf("%d, ", states[i]);
 
-    // }
-    // printf("\n");
-    // printf("DfaState \n");
-    // for(int i = 0; i < dfaStatesCount; i++){
-    //     printf("%d: ", i);
-    //     for(int j = 0; j < MAX_STATES; j++){
-    //         if(dfaStates[i][j] == 1){
-    //             printf("%d, ", j);
-    //         }
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
+    }
+    printf("\n");
+    printf("DfaState \n");
+    for(int i = 0; i < dfaStatesCount; i++){
+        printf("%d: ", i);
+        for(int j = 0; j < MAX_STATES; j++){
+            if(dfaStates[i][j] == 1){
+                printf("%d, ", j);
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+#endif
+    
 
     for(int i = 0; i < dfaStatesCount; i++){
         for(int j = 0; j < stateCount; j++){
@@ -43,30 +47,38 @@ static int findDfaState(int states[], int stateCount){
     return -1;
 }
 static void setAccState(FiniteAuto *dfa, FiniteAuto *fa){
-    // printf("DfaState \n");
-    // for(int i = 0; i < dfaStatesCount; i++){
-    //     printf("%d: ", i);
-    //     for(int j = 0; j < MAX_STATES; j++){
-    //         if(dfaStates[i][j] == 1){
-    //             printf("%d, ", j);
-    //         }
-    //     }
-    //     printf("\n");
-    // }
-    // printf("\n");
-    // printf("setAccState \n");
+#ifdef DEBUG_MODE
+    printf("DfaState \n");
+    for(int i = 0; i < dfaStatesCount; i++){
+        printf("%d: ", i);
+        for(int j = 0; j < MAX_STATES; j++){
+            if(dfaStates[i][j] == 1){
+                printf("%d, ", j);
+            }
+        }
+        printf("\n");
+    }
+    printf("\n");
+#endif
+
+#ifdef DEBUG_MODE
+    printf("setAccState \n");
+#endif
     for(int i = 0; i < dfaStatesCount; i++){
         if(dfaStates[i][fa->accState[fa->accStateCount - 1]] == 1){
             dfa->accState[dfa->accStateCount++] = i;
-            // printf("dfa->accState %d, ", dfa->accState[dfa->accStateCount - 1]);
-            // printf("fa->accState %d\n", fa->accState[fa->accStateCount - 1]);
-
+#ifdef DEBUG_MODE
+            printf("dfa->accState %d, ", dfa->accState[dfa->accStateCount - 1]);
+            printf("fa->accState %d\n", fa->accState[fa->accStateCount - 1]);
+#endif
         }
     }
 }
 
 static int getDfaTStates(int states[], int s){
-    // printf("getDfaTStates %d\n", s);
+#ifdef DEBUG_MODE
+    printf("getDfaTStates %d\n", s);
+#endif
     int dstStates[MAX_STATES];
     int count = 0;
     for(int i = 0; i < MAX_STATES; i++){
@@ -75,12 +87,16 @@ static int getDfaTStates(int states[], int s){
         }
     }
 
-    // printf("\n");
     for(int i = 0; i < count; i++){
         states[i] = dstStates[i];
-        // printf("%d, ", states[i]);
     }
-    // printf("\n");
+
+#ifdef DEBUG_MODE
+    for(int i = 0; i < count; i++){
+        printf("%d, ", states[i]);
+    }
+    printf("\n");
+#endif
     return count;
 }
 
@@ -100,7 +116,6 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
         stateCount = 1;
     }
 
-    // dfa state A
     for(int i = 0; i < stateCount; i++){
         dfaStates[dfaStatesCount][nextStates[i]] = 1;
     }
@@ -111,7 +126,10 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
 
     while(stackTop != 0){
         int s = stack[--stackTop];
-        // printf("s %d\n", s);
+#ifdef DEBUG_MODE
+    printf("s %d\n", s);
+#endif
+
 
         for(int i = 0; i < inputCount; i++){
             stateCount = getDfaTStates(nextStates, s);
@@ -120,7 +138,9 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
             stateCount = eClosure(nextStates, stateCount, fa);
             if(stateCount == 0) continue;
             int find = findDfaState(nextStates, stateCount);
-            // printf("find %d\n", find);
+#ifdef DEBUG_MODE
+            printf("find %d\n", find);
+#endif
             if(find == -1){
                 for(int j = 0; j < stateCount; j++){
                     dfaStates[dfaStatesCount][nextStates[j]] = 1;
@@ -128,13 +148,19 @@ static void subsetConstruction(FiniteAuto *dfa, FiniteAuto *fa){
                 stack[stackTop++] = dfaStatesCount;
                 find = dfaStatesCount;
                 dfaStatesCount++;
-                // printf("find %d\n", find);
+#ifdef DEBUG_MODE
+                printf("find %d\n", find);
+#endif
             }
             dfa->map[s][inputSymbols[i]][find] = 1;
-            // printf("state: %d->%c->%d\n", s, (char)inputSymbols[i], find);
+#ifdef DEBUG_MODE
+            printf("state: %d->%c->%d\n", s, (char)inputSymbols[i], find);
+#endif
 
         }
-        // printf("top %d\n", stackTop);
+#ifdef DEBUG_MODE
+        printf("top %d\n", stackTop);
+#endif
     }
     setAccState(dfa, fa);
 }
@@ -173,12 +199,10 @@ int dfaMatch(const char *str, const char *regex){
     subsetConstruction(dfa, fa);
 
     if(isMatch(str, dfa)){
-        // printf("MATCH!\n");
         freeFa(fa);
         freeFa(dfa);
         return 1;
     }else{
-        // printf("NOT MATCH!\n");
         freeFa(fa);
         freeFa(dfa);
         return 0;

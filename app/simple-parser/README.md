@@ -41,6 +41,16 @@ or
 ```
 sh test.sh 
 ```
+**Debug Mode:**
+uncomment debug flag in ./src/common.h
+```
+#ifndef simplex_common_h
+#define simplex_common_h
+
+//#define DEBUG_MODE
+
+#endif
+```
 
 # TODO
 - Implement a hash table-based state mapping for improved memory efficiency.
