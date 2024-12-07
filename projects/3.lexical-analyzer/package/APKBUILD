@@ -1,0 +1,23 @@
+# Maintainer: Madukubah <muhalfalah1998@gmail.com>
+
+pkgname="simplex"
+pkgver="1.0.0"
+pkgrel=0
+pkgdesc="Simple regex parser using finite automata"
+url="https://madukubah.github.io"
+arch="all"
+license="MIT"
+source="simplex-1.0.0.tar.gz"
+options="!check"
+builddir="$srcdir"
+
+build(){
+	sh build.sh
+}
+
+package(){
+	install -Dm755 "build/simplex" "$pkgdir/usr/bin/simplex"
+}
+sha512sums="
+0e42d54185c8d8d71ecbe9972200da3ff95a8c36de8f4c91e692d66a7cb012f26dc0d78561d4b2467988b6e78d1be6527b904ee9b96d693e809c1b4f7fb059a6  simplex-1.0.0.tar.gz
+"

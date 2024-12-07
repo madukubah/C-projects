@@ -1,18 +1,19 @@
 FROM alpine:latest
 
-USER root
-
 RUN apk update 
+
 RUN apk add --no-cache gcc musl-dev make
 RUN apk add mandoc
 RUN apk add man-pages
-
 RUN apk add busybox-extras
+RUN apk add nano
 
-RUN mkdir -p /var/www/html/public
+# for building alpine packages
+RUN apk add abuild build-base fakeroot
 
-# RUN cd /var/www/html/public
-# RUN echo "<p>hello world</p>" > /var/www/html/public/index.html
+RUN apk add git
 
-WORKDIR /etc/app
+RUN adduser -D mdkh
+USER mdkh
+WORKDIR /home/mdkh
 CMD ["sh"]

@@ -7,8 +7,7 @@ services:
     platform: linux/amd64
     container_name: C_PROJECT
     volumes:
-      - ./app/:/etc/app
-      - ./app/simple-webserver/public/:/var/www/html/public
+      - ./projects/:/home/mad/projects
     ports:
       - "666:80"
     command: ["sh"]
