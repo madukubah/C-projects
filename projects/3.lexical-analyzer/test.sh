@@ -26,7 +26,7 @@ OBJ_FILES=""
 for TEST_FILE in $TEST_FILES; do
     OBJ_FILE="${TEST_FILE%.c}.o"
 
-    $CC $CFLAGS -c "$TEST_DIR/$TEST_FILE" -o "$OUT_DIR/$OBJ_FILE"
+    $CC $CFLAGS -c "$TEST_DIR/$TEST_FILE" -o "$OUT_DIR/$OBJ_FILE" -I ./include
 
     if [ $? -ne 0 ]; then
         echo "Error compiling $TEST_FILE"
@@ -39,7 +39,7 @@ done
 for SRC_FILE in $SRC_FILES; do
     OBJ_FILE="${SRC_FILE%.c}.o"
 
-    $CC $CFLAGS -c "$SRC_DIR/$SRC_FILE" -o "$OUT_DIR/$OBJ_FILE"
+    $CC $CFLAGS -c "$SRC_DIR/$SRC_FILE" -o "$OUT_DIR/$OBJ_FILE" -I ./include
 
     if [ $? -ne 0 ]; then
         echo "Error compiling $SRC_FILE"
@@ -49,7 +49,7 @@ for SRC_FILE in $SRC_FILES; do
     OBJ_FILES="$OBJ_FILES $OUT_DIR/$OBJ_FILE"
 done
 
-$CC $OBJ_FILES -o "$OUT_DIR/$OUTPUT"
+$CC $OBJ_FILES -o "$OUT_DIR/$OUTPUT" -I ./include
 
 if [ $? -ne 0 ]; then
     echo "Linking failed."

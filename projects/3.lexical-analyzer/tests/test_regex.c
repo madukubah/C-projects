@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <assert.h>
 
-#include "../src/dfa.h"
-#include "../src/nfa.h"
+#include "dfa.h"
+#include "nfa.h"
 
 int main(){
 
