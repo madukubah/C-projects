@@ -132,13 +132,14 @@ int nfaMatch(const char *str, const char *regex){
     OperationList operationList = getOpList(regex);
 
     buildNfa(fa, operationList);
-
-    if(isMatch(str, fa)){
+    
+    int result = isMatch(str, fa);
+    if(result){
         freeFa(fa);
-        return 1;
+        return result;
     }else{
         freeFa(fa);
-        return 0;
+        return result;
     }
 }
 

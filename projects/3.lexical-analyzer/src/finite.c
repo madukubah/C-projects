@@ -5,11 +5,11 @@
 
 #include "common.h"
 #ifdef DEBUG_MODE
-#include "./utils/debug.h"
+#include "debug.h"
 #endif
 
 #include "finite.h"
-#include "utils/parser.h"
+#include "parser.h"
 
 bool isAlphaNumeric(char c){
     return ('a' <= c && c <= 'z') ||
@@ -132,7 +132,10 @@ int isMatch(const char *str, FiniteAuto *fa){
     printf("isMatch: %s\n", str);
 #endif
     const char *p = str;
-
+    int length = 0;
+    int prevStates[MAX_STATES];
+    int prevStateCount = 0;
+    
     int nextStates[MAX_STATES];
     int stateCount = 0;
     nextStates[0] = fa->startState;
@@ -142,20 +145,26 @@ int isMatch(const char *str, FiniteAuto *fa){
         nextStates[0] = fa->startState;
         stateCount = 1;
     }
+    memcpy(prevStates, nextStates, sizeof(int) * stateCount);
 
     while(*p != '\0'){
         char c = *p;
         stateCount = move(nextStates, stateCount, (int)c, fa);
         stateCount = eClosure(nextStates, stateCount, fa);
+        if(stateCount == 0) break;
+        
+        memcpy(prevStates, nextStates, sizeof(int) * stateCount);
+        prevStateCount = stateCount;
         p++;
+        length++;
     }
 
 
     // printf("Check State \n");
-    for(int i = 0; i < stateCount; i++){
+    for(int i = 0; i < prevStateCount; i++){
         // printf("%d, %d \n", nextStates[i], fa->accState[fa->accStateCount - 1]);
-        if(nextStates[i] == fa->accState[fa->accStateCount - 1]){
-            return 1;
+        if(prevStates[i] == fa->accState[fa->accStateCount - 1]){
+            return length;
         }
     }
 

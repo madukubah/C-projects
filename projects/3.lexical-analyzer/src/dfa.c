@@ -198,10 +198,11 @@ int dfaMatch(const char *str, const char *regex){
     FiniteAuto *dfa = AllocateFa();
     subsetConstruction(dfa, fa);
 
-    if(isMatch(str, dfa)){
+    int result = isMatch(str, dfa);
+    if(result){
         freeFa(fa);
         freeFa(dfa);
-        return 1;
+        return result;
     }else{
         freeFa(fa);
         freeFa(dfa);

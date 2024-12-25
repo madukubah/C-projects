@@ -24,7 +24,7 @@ OBJ_FILES=""
 for SRC_FILE in $SRC_FILES; do
     OBJ_FILE="${SRC_FILE%.c}.o"
 
-    $CC $CFLAGS -c "$SRC_DIR/$SRC_FILE" -o "$OUT_DIR/$OBJ_FILE"
+    $CC $CFLAGS -c "$SRC_DIR/$SRC_FILE" -o "$OUT_DIR/$OBJ_FILE" -I ./include
 
     if [ $? -ne 0 ]; then
         echo "Error compiling $SRC_FILE"
@@ -34,7 +34,7 @@ for SRC_FILE in $SRC_FILES; do
     OBJ_FILES="$OBJ_FILES $OUT_DIR/$OBJ_FILE"
 done
 
-$CC $OBJ_FILES -o "$OUT_DIR/$OUTPUT"
+$CC $OBJ_FILES -o "$OUT_DIR/$OUTPUT" -I ./include
 
 if [ $? -ne 0 ]; then
     echo "Linking failed."
@@ -42,3 +42,14 @@ if [ $? -ne 0 ]; then
 else
     echo "Compilation successful. executable created: $OUT_DIR/$OUTPUT"
 fi
+
+# echo "create simplex as a library"
+# ar rcs "$OUT_DIR/libsimplex.a" $OBJ_FILES
+
+
+#if [ $? -ne 0 ]; then
+#    echo "Build Library failed."
+#    exit 1
+#else
+#    echo "Build Library successful. libdir: $OUT_DIR/libsimplex.a"
+#fi

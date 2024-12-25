@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 
-#include "utils/parser.h"
+#include "parser.h"
 
 typedef enum {
     NFA,
