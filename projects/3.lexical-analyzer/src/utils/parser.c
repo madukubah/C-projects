@@ -2,10 +2,17 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
+#include "common.h"
 #include "parser.h"
 #include "scanner.h"
+#include "finite.h"
+#include "scanner.h"
 
-OperationList opList;
+#ifdef DEBUG_MODE
+#include "debug.h"
+#endif
+
+struct OperationList opList;
 
 typedef enum {
     PREC_NONE,
@@ -31,7 +38,31 @@ typedef struct {
     bool hadError;
 } Parser;
 
-Parser parser;
+static Parser parser;
+
+static void insertConcat(char *dst, const char *regex){
+    int i, j = 0;
+    char prev = '\0';
+    for(i = 0;  regex[i] != '\0'; i++){
+        char curr = regex[i];
+        if(j >= 1){
+            if(
+                (isAlphaNumeric(prev) || prev == ')' || prev == '*' )
+                &&
+                (isAlphaNumeric(curr) || curr == '(')
+            ){
+                dst[j++] = '.';
+            }
+
+        }
+        dst[j++] = curr;
+        prev = curr;
+    }
+    dst[j] = '\0';
+#ifdef DEBUG_MODE
+    printf("Augmented regex: %s\n", dst);
+#endif
+}
 
 static void errorAt(Token *token, const char* message){
     if(parser.panicMode) return;
@@ -142,7 +173,6 @@ static void parsePrecedence(Precedence precedence){
         advance();
         postfixRule();
     }
-
     while(getRule(parser.current.type)->precedence >= precedence){
         advance();
         RuleFn infixRule = getRule(parser.previous.type)->infix;
@@ -160,12 +190,18 @@ static void init(){
     parser.hadError = false;
 }
 
-OperationList parse(char *regex){
-    initScanner(regex);
+struct OperationList parse(const char *regex){
+    char augmentedRegex[512];
+    insertConcat(augmentedRegex, regex);
+    initScanner(augmentedRegex);
     init();
 
     advance();
     expression();
+
+#ifdef DEBUG_MODE
+    printOpList(opList);
+#endif
     return opList;
 
 }

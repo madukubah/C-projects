@@ -4,19 +4,20 @@
 #include <string.h>
 #include <stdbool.h>
 
+#include "common.h"
 #include "scanner.h"
 
-Scanner scanner;
+static Scanner scanner;
 
 static bool isAlpha(const char c){
-    return (c >= 'a' && c <= 'z' ) || (c >= 'A' && c <= 'Z' ) || c == '_';
+    return (c >= 'a' && c <= 'z' ) || (c >= 'A' && c <= 'Z' ) || c == '_' || c == '`';
 }
 
 static bool isDigit(const char c){
     return (c >= '0' && c <= '9' );
 }
 
-static bool isAphaNumeric(const char c){
+bool isAlphaNumeric(const char c){
     return isAlpha(c) || isDigit(c);
 }
 
@@ -42,7 +43,7 @@ Token scanToken(){
     
     char c = advance();
 
-    if(isAphaNumeric(c)){
+    if(isAlphaNumeric(c)){
         return makeToken(TOKEN_LITERAL);
     }else{
         switch(c){

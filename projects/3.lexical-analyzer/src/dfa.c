@@ -6,6 +6,8 @@
 #include "dfa.h"
 #include "nfa.h"
 #include "finite.h"
+#include "parser.h"
+#include "scanner.h"
 
 int dfaStates[MAX_STATES][MAX_STATES];
 int dfaStatesCount = 0;
@@ -188,8 +190,8 @@ void initDfa(){
 }
 
 int dfaMatch(const char *str, const char *regex){
-    FiniteAuto *fa = AllocateFa();
-    OperationList operationList = getOpList(regex);
+    struct FiniteAuto *fa = AllocateFa();
+    struct OperationList operationList = parse(regex);
     buildNfa(fa, operationList);
 
     initDfa();

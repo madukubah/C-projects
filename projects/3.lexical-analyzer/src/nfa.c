@@ -5,6 +5,7 @@
 #include "common.h"
 #include "nfa.h"
 #include "finite.h"
+#include "parser.h"
 
 typedef struct {
     FiniteAutoItem items[1024];
@@ -81,7 +82,7 @@ static void star(FiniteAutoItem *result, FiniteAutoItem *item, FiniteAuto *fa){
     fa->stateCount++;
 }
 
-void buildNfa(FiniteAuto *fa, OperationList opList){
+void buildNfa(struct FiniteAuto *fa, struct OperationList opList){
     initStack();
 
     for(int i = 0; i < opList.count; i++){
@@ -127,11 +128,15 @@ void buildNfa(FiniteAuto *fa, OperationList opList){
 #endif
 }
 
-int nfaMatch(const char *str, const char *regex){
-    FiniteAuto *fa = AllocateFa();
-    OperationList operationList = getOpList(regex);
-
+struct FiniteAuto *buildNfafStr(const char *regex){
+    struct FiniteAuto *fa = AllocateFa();
+    OperationList operationList = parse(regex);
     buildNfa(fa, operationList);
+    return fa;
+}
+
+int nfaMatch(const char *str, const char *regex){
+    struct FiniteAuto *fa = buildNfafStr(regex);
     
     int result = isMatch(str, fa);
     if(result){

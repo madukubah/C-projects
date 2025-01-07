@@ -9,37 +9,13 @@
 #endif
 
 #include "finite.h"
-#include "parser.h"
+//#include "parser.h"
 
-bool isAlphaNumeric(char c){
-    return ('a' <= c && c <= 'z') ||
-            ('A' <= c && c <= 'Z') ||
-            ('0' <= c && c <= '9');
-}
-
-static void insertConcat(char *dst, const char *regex){
-    int i, j = 0;
-    char prev = '\0';
-    for(i = 0;  regex[i] != '\0'; i++){
-        char curr = regex[i];
-        if(j >= 1){
-            if(
-                (isAlphaNumeric(prev) || prev == ')' || prev == '*' )
-                &&
-                (isAlphaNumeric(curr) || curr == '(')
-            ){
-                dst[j++] = '.';
-            }
-
-        }
-        dst[j++] = curr;
-        prev = curr;
-    }
-    dst[j] = '\0';
-#ifdef DEBUG_MODE
-    printf("Augmented regex: %s\n", dst);
-#endif
-}
+/*bool isAlphaNumeric(char c){*/
+    /*return ('a' <= c && c <= 'z') ||*/
+            /*('A' <= c && c <= 'Z') ||*/
+            /*('0' <= c && c <= '9');*/
+/*}*/
 
 int move(int states[], int stateCount, int c, FiniteAuto *fa){
 #ifdef DEBUG_MODE
@@ -171,7 +147,7 @@ int isMatch(const char *str, FiniteAuto *fa){
     return 0;
 }
 
-FiniteAuto *AllocateFa(){
+struct FiniteAuto *AllocateFa(){
     FiniteAuto *fa = (FiniteAuto *)malloc(sizeof(FiniteAuto));
     memset(fa->map, -1, sizeof(int) * MAX_STATES * MAX_SYMBOLS * MAX_STATES);
     fa->startState = 0;
@@ -179,18 +155,6 @@ FiniteAuto *AllocateFa(){
     memset(fa->accState, -1, sizeof(int) * MAX_STATES);
     fa->accStateCount = 0;
     return fa;
-}
-
-OperationList getOpList(const char *regex){
-    char augmentedRegex[512];
-    insertConcat(augmentedRegex, regex);
-    OperationList operationList = parse(augmentedRegex);
-
-    #ifdef DEBUG_MODE
-        printOpList(operationList);
-    #endif
-
-    return operationList;
 }
 
 void freeFa(FiniteAuto *fa){

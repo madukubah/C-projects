@@ -13,11 +13,11 @@ typedef struct {
     char value;
 } Operation;
 
-typedef struct {
+typedef struct OperationList {
     int count;
     Operation operations[1024];
 } OperationList;
 
-OperationList parse(char *regex);
+struct OperationList parse(const char *regex);
 
 #endif

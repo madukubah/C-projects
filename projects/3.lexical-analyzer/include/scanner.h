@@ -24,6 +24,8 @@ typedef struct {
     const char *current;
 } Scanner;
 
+
+bool isAlphaNumeric(const char c);
 void initScanner(const char *str);
 Token scanToken();
 

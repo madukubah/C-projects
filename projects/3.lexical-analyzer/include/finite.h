@@ -6,14 +6,12 @@
 
 #include <stdbool.h>
 
-#include "parser.h"
-
 typedef enum {
     NFA,
     DFA,
 } FAType;
 
-typedef struct {
+typedef struct FiniteAuto {
     int startState;
     int stateCount;
     int accState[MAX_STATES];
@@ -26,12 +24,11 @@ typedef struct {
     int finish;
 } FiniteAutoItem;
 
-bool isAlphaNumeric(char c);
+//bool isAlphaNumeric(char c);
 int move(int states[], int stateCount, int c, FiniteAuto *fa);
 int eClosure(int states[],int stateCount, FiniteAuto *fa);
 int isMatch(const char *str, FiniteAuto *fa);
-FiniteAuto *AllocateFa();
-OperationList getOpList(const char *regex);
+struct FiniteAuto *AllocateFa();
 void freeFa(FiniteAuto *fa);
 
 #endif
