@@ -1,22 +1,51 @@
-# dotfiles
-.*
-!.gitignore
+# ------------------------------
+# OS / Editor junk
+# ------------------------------
 .DS_Store
-
-# Object files
-*.o
-
-# Compiled binary files
-*.out
-*.exe
-
-# IDE specific files
-.vscode/
-.idea/
 *.swp
-*.swo
-*.user
 
-# Build directories
-# simple-webserver build
-*/*/*/build/ 
+# ------------------------------
+# Compiled C/C++ objects & binaries
+# ------------------------------
+*.o
+*.out
+*.bin
+*.exe
+*.a         # Static libraries
+*.so        # Shared libraries
+*.tar.gz    # Packaged releases
+
+# ------------------------------
+# Build artifacts (directories)
+# ------------------------------
+/build/
+/bin/
+/obj/
+/core
+
+# ------------------------------
+# Project-specific build outputs
+# ------------------------------
+projects/simple-webserver/build/
+projects/learnC/simple_calc/build/
+projects/4.syntax-analysis/build/
+projects/3.lexical-analyzer/build/
+projects/3.lexical-analyzer/tests/
+projects/3.lexical-analyzer/package/
+
+# ------------------------------
+# Ignore any generated text/data files in builds
+# ------------------------------
+*.txt
+!src/**/*.txt   # but keep source txt files
+
+# ------------------------------
+# Exceptions — keep source code & configs
+# ------------------------------
+!*.c
+!*.h
+!*.conf
+!*.sh
+!*.md
+!*.yaml
+!*.json

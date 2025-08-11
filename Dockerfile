@@ -12,6 +12,18 @@ RUN apk add nano
 RUN apk add abuild build-base fakeroot
 
 RUN apk add git
+RUN apk add vim
+
+RUN apk add linux-virt
+RUN apk add linux-lts
+RUN apk add openvpn
+RUN apk add autoconf automake
+RUN apk add libtool
+
+RUN apk add samba-client
+
+# RUN apk add nmap
+
 
 RUN adduser -D mdkh
 USER mdkh

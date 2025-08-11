@@ -1,13 +1,22 @@
 version: '3'
 services:
   c_prj:
-    build:  
-      context: .
-      dockerfile: Dockerfile
+    # build:  
+    #   context: .
+    #   dockerfile: Dockerfile
+    image: c-projects-c_prj 
     platform: linux/amd64
     container_name: C_PROJECT
+    cap_add:
+      - NET_RAW
+      - NET_ADMIN
+    network_mode: host
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    environment:
+      - ENABLE_IPV6=true # Optional: pass this as a variable
     volumes:
-      - ./projects/:/home/mad/projects
+      - ./projects/:/home/mdkh/projects
     ports:
       - "666:80"
     command: ["sh"]
